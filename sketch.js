@@ -46,19 +46,19 @@ let level = [
   "              ",
   "              ",
   "              ",
-  "              ",
-  "              ",
+  "           ggg",
   "       ggg    ",
+  "   ggg        ",
   "gggggggggggggg", // surface ground
   "dddddddddddddd", // deep ground
 ];
 
 let level2 = [
   "              ",
-  "     ggg      ",
+  "            gg",
+  "         g    ",
   "              ",
-  "   g     g    ",
-  "            g ",
+  "  gg       gg ",
   "      ggg     ",
   "gggggggggggggg",
   "dddddddddddddd",
@@ -217,7 +217,7 @@ function keyPressed() {
 
     if (currentLevel === 1) {
       loadLevel(level);
-    } else if (currentLevel === 2) {
+    } else {
       loadLevel(level2);
     }
   }
@@ -289,6 +289,7 @@ function draw() {
   // --- KEEP IN VIEW ---
   player.pos.x = constrain(player.pos.x, FRAME_W / 2, VIEWW - FRAME_W / 2);
 
+  // draw debug menu
   if (debugMode) {
     camera.off();
     fill(0, 0, 0, 150);
