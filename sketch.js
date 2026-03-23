@@ -19,6 +19,10 @@ let player;
 let playerImg, bgImg;
 let jumpSfx, musicSfx;
 let musicStarted = false;
+// degbug state variables
+let debugMode = false;
+let moonGravity = false;
+let showHitboxes = false;
 
 let playerAnis = {
   idle: { row: 0, frames: 4, frameDelay: 10 },
@@ -154,6 +158,23 @@ function startMusicIfNeeded() {
 
 function keyPressed() {
   startMusicIfNeeded();
+
+  // toggle debug menu
+  if (key === "m") {
+    debugMode = !debugMode;
+  }
+
+  // toggle moon gravity
+  if (debugMode && key === "g") {
+    moonGravity = !moonGravity;
+    world.gravity.y = moonGravity ? 2 : GRAVITY;
+  }
+
+  // toggle hitbox visibility
+  if (debugMode && key === "h") {
+    showHitboxes = !showHitboxes;
+    allSprites.debug = showHitboxes;
+  }
 }
 
 function mousePressed() {
@@ -221,4 +242,22 @@ function draw() {
 
   // --- KEEP IN VIEW ---
   player.pos.x = constrain(player.pos.x, FRAME_W / 2, VIEWW - FRAME_W / 2);
+
+  if (debugMode) {
+    camera.off();
+    fill(0, 0, 0, 150);
+    rect(10, 10, 150, 70);
+
+    fill(255);
+    textSize(10);
+    text("DEBUG MENU", 20, 25);
+    text("G: Moon Gravity: " + (moonGravity ? "ON" : "OFF"), 20, 40);
+    text("H: Show Hitboxes: " + (showHitboxes ? "ON" : "OFF"), 20, 55);
+    text(
+      "Player Vel: " + nf(player.vel.x, 1, 2) + ", " + nf(player.vel.y, 1, 2),
+      20,
+      70,
+    );
+    camera.on();
+  }
 }
