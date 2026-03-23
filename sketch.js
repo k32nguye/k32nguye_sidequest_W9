@@ -17,8 +17,11 @@
 
 let player;
 let playerImg, bgImg;
+
 let jumpSfx, musicSfx;
 let musicStarted = false;
+let currentLevel = 1;
+
 // degbug state variables
 let debugMode = false;
 let moonGravity = false;
@@ -48,6 +51,17 @@ let level = [
   "       ggg    ",
   "gggggggggggggg", // surface ground
   "dddddddddddddd", // deep ground
+];
+
+let level2 = [
+  "              ",
+  "     ggg      ",
+  "              ",
+  "   g     g    ",
+  "            g ",
+  "      ggg     ",
+  "gggggggggggggg",
+  "dddddddddddddd",
 ];
 
 // --- LEVEL CONSTANTS ---
@@ -107,8 +121,8 @@ function setup() {
   groundDeep.img = groundDeepImg;
   groundDeep.tile = "d";
 
-  // a Tiles object creates a level based on the level map array (defined at the beginning)
-  new Tiles(level, 0, 0, TILE_W, TILE_H);
+  // load the first level
+  loadLevel(level);
 
   // --- PLAYER ---
   player = new Sprite(FRAME_W, MAP_START_Y, FRAME_W, FRAME_H); // create the player
@@ -139,6 +153,23 @@ function setup() {
   sensorJoint.visible = false;
 }
 
+function loadLevel(levelData) {
+  // remove old tiles from the ground groups
+  if (ground) ground.removeAll();
+  if (groundDeep) groundDeep.removeAll();
+
+  // build new tiles
+  new Tiles(levelData, 0, 0, TILE_W, TILE_H);
+
+  // only reset player if it already exists
+  if (player) {
+    player.pos.x = FRAME_W;
+    player.pos.y = MAP_START_Y;
+    player.vel.x = 0;
+    player.vel.y = 0;
+  }
+}
+
 function startMusicIfNeeded() {
   if (musicStarted || !musicSfx) return;
 
@@ -167,13 +198,28 @@ function keyPressed() {
   // toggle moon gravity
   if (debugMode && key === "g") {
     moonGravity = !moonGravity;
-    world.gravity.y = moonGravity ? 2 : GRAVITY;
+    world.gravity.y = moonGravity ? 4.5 : GRAVITY;
   }
 
   // toggle hitbox visibility
   if (debugMode && key === "h") {
     showHitboxes = !showHitboxes;
     allSprites.debug = showHitboxes;
+  }
+
+  // changes level screen
+  if (key === "l") {
+    currentLevel++;
+
+    if (currentLevel > 2) {
+      currentLevel = 1;
+    }
+
+    if (currentLevel === 1) {
+      loadLevel(level);
+    } else if (currentLevel === 2) {
+      loadLevel(level2);
+    }
   }
 }
 
@@ -246,13 +292,13 @@ function draw() {
   if (debugMode) {
     camera.off();
     fill(0, 0, 0, 150);
-    rect(10, 10, 150, 70);
+    rect(10, 10, 175, 70);
 
     fill(255);
     textSize(10);
     text("DEBUG MENU", 20, 25);
-    text("G: Moon Gravity: " + (moonGravity ? "ON" : "OFF"), 20, 40);
-    text("H: Show Hitboxes: " + (showHitboxes ? "ON" : "OFF"), 20, 55);
+    text("G key = Moon Gravity: " + (moonGravity ? "ON" : "OFF"), 20, 40);
+    text("H key = Show Hitboxes: " + (showHitboxes ? "ON" : "OFF"), 20, 55);
     text(
       "Player Vel: " + nf(player.vel.x, 1, 2) + ", " + nf(player.vel.y, 1, 2),
       20,
